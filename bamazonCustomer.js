@@ -11,30 +11,32 @@ var connection = mysql.createConnection({
 
 connection.connect( (err) => {
 
-  if (err) throw err;
-  listProducts();
+    if (err) throw err;
+    listProducts();
 });
 
 function listProducts(){
 
-  connection.query("SELECT * FROM products", (err, results) => {
+    connection.query("SELECT * FROM products", (err, results) => {
 
-    if (err) throw err;
+        if (err) throw err;
 
-    console.log("Listing all products...\n");
-    for(var i=0; i < results.length; i++){
-    	console.log("ID: "+results[i].item_id);
-    	console.log("Product: "+results[i].product_name);
-    	console.log("Price: $"+results[i].price+"\n");
-	}
+        console.log("Listing all products...\n");
+        for(var i=0; i < results.length; i++){
+            console.log("ID: "+results[i].item_id);
+    	      console.log("Product: "+results[i].product_name);
+    	      console.log("Price: $"+results[i].price+"\n");
+	      }
     
-    buyPrompt();
-  });
+        buyPrompt();
+    });
 }
 
 function buyPrompt(){
 
-	inquirer.prompt([
+    // Gather the product ID number and quantity/units
+    // requested from the user.
+    inquirer.prompt([
     {
         type: "input",
         name: "itemId",
@@ -45,32 +47,77 @@ function buyPrompt(){
         name: "units",
         message: "How many would you like to buy?"
     }
-	]).then(function(response) {
+	  ]).then( function(response) {
 
         if(isNaN(response.itemId) === false &&
            isNaN(response.units) === false){
 
-        	checkInventory(response.itemId, response.units);
+        	checkInventory(parseInt(response.itemId), parseInt(response.units));
         }
-	});
+	  });
 }
 
 function checkInventory(itemId, units){
 
-    connection.query("SELECT stock_quantity FROM products WHERE ?",
+    connection.query("SELECT stock_quantity, price FROM products WHERE ?",
     	             {item_id: itemId}, (err, results) => {
 
         if (err) throw err;
 
-    	if(results !== undefined){
-    		let stock = results[0].stock_quantity;
-    		
-    		if(parseInt(stock) < parseInt(units)){
-    			console.log("Insufficient quantity!");
-    		} else{
-    			console.log("OK!");
-    		}
-    		connection.end();
-		}
-    });	
+      	if(results !== undefined){
+
+      		let stock = results[0].stock_quantity;
+          let price = results[0].price;
+
+    		  // Compare existing stock to requested unit amount.
+      		if(stock < units){
+
+      			console.log("Insufficient quantity!");
+
+            continueShopping();
+      		} else{
+
+            // Update the database and reduce the quantity.
+            setQuantity(itemId, stock, units, price);
+      		}
+		  }
+    });
+}
+
+function setQuantity(itemId, stock, units, price){
+
+    // Calculate the reduced quantity.
+    var newQuantity = stock - units;
+    // Calculate the user's cost for this transaction.
+    var cost = units * price;
+
+
+    // Update the database.
+    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
+                     [newQuantity, itemId], (err, results) => {
+
+        if (err) throw err;
+        console.log("Your total cost is: $" + cost + "\n");
+
+        continueShopping();
+    });
+}
+
+
+function continueShopping(){
+
+    inquirer.prompt([
+    {
+        type: "confirm",
+        name: "yesNo",
+        message: "Would you like to buy another item?"
+    }
+    ]).then( function(response) {
+
+        if(response.yesNo){
+            listProducts();
+        } else {
+            connection.end();
+        }
+    });
 }
