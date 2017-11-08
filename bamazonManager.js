@@ -38,7 +38,7 @@ function mainMenu(){
             lowStock();
             break;
           case "Add to Inventory":
-            addStock
+            addStock();
             break;
           case "Add New Product":
             break;
@@ -80,16 +80,57 @@ function listProducts(){
     });
 }
 
-function addStock(itemId, units){
+function addStock(){
 
- /*   connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
-                     [newQuantity, itemId], (err, results) => {
+    connection.query("SELECT product_name, item_id, stock_quantity FROM products", (err, results) => {
 
         if (err) throw err;
-        console.log("Your total cost is: $" + cost + "\n");
 
-        continueShopping();
-    });*/
+        var choices = [];
+        for(var i=0; i < results.length; i++){
+            choices.push({name: results[i].product_name,
+                          value: {id: results[i].item_id,
+                                  stock: results[i].stock_quantity}});
+        }
+
+        inquirer.prompt([
+        {
+            type: "list",
+            name: "item",
+            message: "Select a product:",
+            choices: choices
+        },
+        {
+            type: "input",
+            name: "amount",
+            message: "How many would you like to add?",
+            validate: function(value) {
+                return isNaN(value) === true ? false : true;
+            }              
+        }
+        ]).then( function(response) {
+
+            let stock = parseInt(response.item.stock);
+            let id = parseInt(response.item.id);
+            let units = parseInt(response.amount);
+            addQuantity(id, stock, units);
+        });
+
+    });
+}
+
+function addQuantity(itemId, stock, units){
+
+    // Calculate the reduced quantity.
+    var newQuantity = stock + units;
+
+    // Update the database.
+    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
+                     [newQuantity, itemId], (err, results) => {
+        if (err) throw err;
+        console.log(`Item #${itemId} inventory increased by ${units} to ${newQuantity}.`);
+        backToMain();
+    });
 }
 
 function backToMain(){

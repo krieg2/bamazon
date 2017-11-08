@@ -80,13 +80,13 @@ function checkInventory(itemId, units){
       		} else{
 
             // Update the database and reduce the quantity.
-            setQuantity(itemId, stock, units, price);
+            reduceQuantity(itemId, stock, units, price);
       		}
 		  }
     });
 }
 
-function setQuantity(itemId, stock, units, price){
+function reduceQuantity(itemId, stock, units, price){
 
     // Calculate the reduced quantity.
     var newQuantity = stock - units;
