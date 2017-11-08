@@ -40,20 +40,22 @@ function buyPrompt(){
     {
         type: "input",
         name: "itemId",
-        message: "Which product ID would you like to buy?"
+        message: "Which product ID would you like to buy?",
+        validate: function(value) {
+            return isNaN(value) === true ? false : true;
+        }
     },
     {
         type: "input",
         name: "units",
-        message: "How many would you like to buy?"
+        message: "How many would you like to buy?",
+        validate: function(value) {
+            return isNaN(value) === true ? false : true;
+        }        
     }
 	  ]).then( function(response) {
 
-        if(isNaN(response.itemId) === false &&
-           isNaN(response.units) === false){
-
-        	checkInventory(parseInt(response.itemId), parseInt(response.units));
-        }
+        checkInventory(parseInt(response.itemId), parseInt(response.units));
 	  });
 }
 
