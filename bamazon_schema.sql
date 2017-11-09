@@ -47,3 +47,14 @@ VALUES (11, 'iPhone 5c', 'electronics', 160.00, 10);
 
 INSERT INTO products
 VALUES (12, 'iPhone 5s', 'electronics', 180.00, 10);
+
+
+CREATE TABLE departments (
+    department_id INT AUTO_INCREMENT NOT NULL,
+    department_name VARCHAR(50) NOT NULL,
+    over_head_costs DECIMAL(10,2),
+    PRIMARY KEY (department_id)
+);
+
+ALTER TABLE products
+ADD product_sales column INT;
