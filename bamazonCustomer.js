@@ -95,8 +95,9 @@ function reduceQuantity(itemId, stock, units, price){
 
 
     // Update the database.
-    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
-                     [newQuantity, itemId], (err, results) => {
+    connection.query("UPDATE products SET stock_quantity = ? , product_sales = ? " +
+                     "WHERE item_id = ?",
+                     [newQuantity, cost, itemId], (err, results) => {
 
         if (err) throw err;
         console.log("Your total cost is: $" + cost + "\n");
