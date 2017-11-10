@@ -31,6 +31,8 @@ function mainMenu(){
     }
     ]).then( function(response) {
 
+        // These are the main menu choices
+        // and their corresponsing function calls.
         switch (response.choice) {
           case "View Products for Sale":
             listProducts();
@@ -52,34 +54,43 @@ function mainMenu(){
 
 function lowStock(){
 
+    // Finds all products with a quantity less than 5.
     connection.query("SELECT * FROM products WHERE stock_quantity < 5", (err, results) => {
 
         if (err) throw err;
 
         console.log("Listing low inventory products...\n");
+
+        // Display the results.
         for(var i=0; i < results.length; i++){
             console.log("ID: "+results[i].item_id);
             console.log("Product: "+results[i].product_name);
             console.log("Price: $"+results[i].price);
             console.log("Quantity: "+results[i].stock_quantity+"\n");
         }
+
+        // Then prompt to return back to the main menu.
         backToMain();
     });
 }
 
 function listProducts(){
 
+    // List all products in the database.
     connection.query("SELECT * FROM products", (err, results) => {
 
         if (err) throw err;
 
         console.log("Listing all products...\n");
+
+        // Display the results.
         for(var i=0; i < results.length; i++){
             console.log("ID: "+results[i].item_id);
     	    console.log("Product: "+results[i].product_name);
     	    console.log("Price: $"+results[i].price);
             console.log("Quantity: "+results[i].stock_quantity+"\n");
 	    }
+
         backToMain();
     });
 }
@@ -109,7 +120,7 @@ function addStock(){
             name: "amount",
             message: "How many would you like to add?",
             validate: function(value) {
-                return isNaN(value) === true ? false : true;
+                return isNaN(value) === true || value < 1 ? false : true;
             }              
         }
         ]).then( function(response) {
@@ -157,7 +168,7 @@ function addProduct(){
         name: "price",
         message: "Price:",
         validate: function(value) {
-            return isNaN(value) === true ? false : true;
+            return isNaN(value) === true || value <= 0 ? false : true;
         }              
     },
     {
@@ -199,9 +210,11 @@ function backToMain(){
 
         if(response.yesNo){
 
+            // Display the main menu.
             mainMenu();
         } else {
 
+            // End the connection.
             connection.end();
         }
     });
