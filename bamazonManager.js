@@ -26,7 +26,8 @@ function mainMenu(){
         choices: ["View Products for Sale",
                   "View Low Inventory",
                   "Add to Inventory",
-                  "Add New Product"]
+                  "Add New Product",
+                  "Exit"]
     }
     ]).then( function(response) {
 
@@ -41,7 +42,10 @@ function mainMenu(){
             addStock();
             break;
           case "Add New Product":
+            addProduct();
             break;
+          case "Exit":
+            connection.end();
         }
     });
 }
@@ -114,23 +118,73 @@ function addStock(){
             let id = parseInt(response.item.id);
             let units = parseInt(response.amount);
             addQuantity(id, stock, units);
+
+            backToMain();
         });
 
     });
 }
 
-function addQuantity(itemId, stock, units){
+function addProduct(){
 
-    // Calculate the reduced quantity.
-    var newQuantity = stock + units;
+    inquirer.prompt([
+    {
+        type: "input",
+        name: "prodName",
+        message: "Product name:",
+        validate: function(value) {
+            if(value.length > 0 && value.length <= 100){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    },
+    {
+        type: "input",
+        name: "deptName",
+        message: "Department name:",
+        validate: function(value) {
+            if(value.length > 0 && value.length <= 50){
+                return true;
+            } else {
+                return false;
+            }
+        }              
+    },
+    {
+        type: "input",
+        name: "price",
+        message: "Price:",
+        validate: function(value) {
+            return isNaN(value) === true ? false : true;
+        }              
+    },
+    {
+        type: "input",
+        name: "stockQty",
+        message: "Inventory quantity:",
+        validate: function(value) {
+            return isNaN(value) === true ? false : true;
+        }              
+    }
+    ]).then( function(response) {
 
-    // Update the database.
-    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
-                     [newQuantity, itemId], (err, results) => {
-        if (err) throw err;
-        console.log(`Item #${itemId} inventory increased by ${units} to ${newQuantity}.`);
-        backToMain();
+        let values = {product_name: response.prodName,
+                      department_name: response.deptName,
+                      price: parseInt(response.price),
+                      stock_quantity: parseInt(response.stockQty)};
+
+        connection.query("INSERT INTO products SET ?",
+                         values, (err, results) => {
+
+            if (err) throw err;
+
+            console.log("Product has been added.");
+            backToMain();
+        });
     });
+
 }
 
 function backToMain(){
@@ -144,8 +198,10 @@ function backToMain(){
     ]).then( function(response) {
 
         if(response.yesNo){
+
             mainMenu();
         } else {
+
             connection.end();
         }
     });
