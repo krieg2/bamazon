@@ -1,5 +1,6 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const {table} = require("table");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -21,12 +22,20 @@ function listProducts(){
 
         if (err) throw err;
 
-        console.log("Listing all products...\n");
+        // Create the column headers for the table.
+        let header = ["item_id", "product_name", "price"];
+        let data = [header];
+
+        // Push each product result into the data array.
         for(var i=0; i < results.length; i++){
-            console.log("ID: "+results[i].item_id);
-    	      console.log("Product: "+results[i].product_name);
-    	      console.log("Price: $"+results[i].price+"\n");
-	      }
+            data.push([results[i].item_id,
+                       results[i].product_name,
+                       results[i].price]);
+        }
+
+        // Display the results.
+        let output = table(data); 
+        console.log(output);
     
         buyPrompt();
     });
@@ -55,12 +64,14 @@ function buyPrompt(){
     }
 	  ]).then( function(response) {
 
+        // Check the stock...
         checkInventory(parseInt(response.itemId), parseInt(response.units));
 	  });
 }
 
 function checkInventory(itemId, units){
 
+    // Query the database for stock_quantity of the given itemId.
     connection.query("SELECT stock_quantity, price FROM products WHERE ?",
     	             {item_id: itemId}, (err, results) => {
 
@@ -68,19 +79,19 @@ function checkInventory(itemId, units){
 
       	if(results !== undefined){
 
-      		let stock = results[0].stock_quantity;
-          let price = results[0].price;
+      	    let stock = results[0].stock_quantity;
+            let price = results[0].price;
 
-    		  // Compare existing stock to requested unit amount.
+    		// Compare existing stock to requested unit amount.
       		if(stock < units){
 
       			console.log("Insufficient quantity!");
 
-            continueShopping();
+                continueShopping();
       		} else{
 
-            // Update the database and reduce the quantity.
-            reduceQuantity(itemId, stock, units, price);
+                // Update the database and reduce the quantity.
+                reduceQuantity(itemId, stock, units, price);
       		}
 		  }
     });
@@ -118,8 +129,12 @@ function continueShopping(){
     ]).then( function(response) {
 
         if(response.yesNo){
+
+            // Display the product menu.
             listProducts();
         } else {
+
+            // End the connection.
             connection.end();
         }
     });

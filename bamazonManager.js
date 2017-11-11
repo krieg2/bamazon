@@ -1,5 +1,6 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const {table} = require("table");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -59,15 +60,21 @@ function lowStock(){
 
         if (err) throw err;
 
-        console.log("Listing low inventory products...\n");
+        // Create the column headers for the table.
+        let header = ["item_id", "product_name", "price", "stock_quantity"];
+        let data = [header];
+
+        // Push each product result into the data array.
+        for(var i=0; i < results.length; i++){
+            data.push([results[i].item_id,
+                       results[i].product_name,
+                       results[i].price,
+                       results[i].stock_quantity]);
+        }
 
         // Display the results.
-        for(var i=0; i < results.length; i++){
-            console.log("ID: "+results[i].item_id);
-            console.log("Product: "+results[i].product_name);
-            console.log("Price: $"+results[i].price);
-            console.log("Quantity: "+results[i].stock_quantity+"\n");
-        }
+        let output = table(data); 
+        console.log(output);
 
         // Then prompt to return back to the main menu.
         backToMain();
@@ -81,15 +88,21 @@ function listProducts(){
 
         if (err) throw err;
 
-        console.log("Listing all products...\n");
+        // Create the column headers for the table.
+        let header = ["item_id", "product_name", "price", "stock_quantity"];
+        let data = [header];
+
+        // Push each product result into the data array.
+        for(var i=0; i < results.length; i++){
+            data.push([results[i].item_id,
+                       results[i].product_name,
+                       results[i].price,
+                       results[i].stock_quantity]);
+        }
 
         // Display the results.
-        for(var i=0; i < results.length; i++){
-            console.log("ID: "+results[i].item_id);
-    	    console.log("Product: "+results[i].product_name);
-    	    console.log("Price: $"+results[i].price);
-            console.log("Quantity: "+results[i].stock_quantity+"\n");
-	    }
+        let output = table(data); 
+        console.log(output);
 
         backToMain();
     });
