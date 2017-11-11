@@ -10,7 +10,7 @@ Bamazon is a Node.js and MySQL storefront application that has customer, manager
 
 Customers can place orders for products. First, the user is presented with a full list of all products. When prompted, an item ID is to be entered, followed by a quantity for that item. If there is not enough stock, the user will be alerted, otherwise the total cost for the order is displayed.
 
-See a demonstration here.
+See a demonstration ![here](Customer.gif).
 
 
 
