@@ -47,7 +47,7 @@ function mainMenu(){
 
 function viewDeptSales(){
 
-	// This query is a RIGHT OUTER JOIN so that all departments can be viewed
+	// This query is an OUTER JOIN so that all departments can be viewed
 	// regardless of whether products exist in that department. Default value
 	// for product_sales and total_profit to 0.
 	connection.query(`SELECT d.department_id, d.department_name,

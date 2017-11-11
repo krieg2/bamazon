@@ -97,12 +97,14 @@ function listProducts(){
 
 function addStock(){
 
+    // First query the products to generate a list of choices.
     connection.query("SELECT product_name, item_id, stock_quantity FROM products", (err, results) => {
 
         if (err) throw err;
 
         var choices = [];
         for(var i=0; i < results.length; i++){
+            // Store the choices in an array for inquirer.
             choices.push({name: results[i].product_name,
                           value: {id: results[i].item_id,
                                   stock: results[i].stock_quantity}});
@@ -128,6 +130,7 @@ function addStock(){
             let stock = parseInt(response.item.stock);
             let id = parseInt(response.item.id);
             let units = parseInt(response.amount);
+            // Proceed to update the database...
             addQuantity(id, stock, units);
         });
 
@@ -153,6 +156,7 @@ function addQuantity(itemId, stock, units){
 
 function addProduct(){
 
+    // Gather the product information from the user.
     inquirer.prompt([
     {
         type: "input",
@@ -201,6 +205,7 @@ function addProduct(){
                       price: parseInt(response.price),
                       stock_quantity: parseInt(response.stockQty)};
 
+        // Update the database.
         connection.query("INSERT INTO products SET ?",
                          values, (err, results) => {
 

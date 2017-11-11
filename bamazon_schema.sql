@@ -23,6 +23,9 @@ CREATE TABLE departments (
 INSERT INTO departments
 VALUES (1, 'electronics', 100.0);
 
+INSERT INTO departments
+VALUES (2, 'clothing', 100.0);
+
 INSERT INTO products
 VALUES (1, 'iPhone X', 'electronics', 999.00, 0, 0.0);
 
