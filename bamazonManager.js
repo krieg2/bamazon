@@ -129,10 +129,25 @@ function addStock(){
             let id = parseInt(response.item.id);
             let units = parseInt(response.amount);
             addQuantity(id, stock, units);
-
-            backToMain();
         });
 
+    });
+}
+
+function addQuantity(itemId, stock, units){
+
+    // Calculate the new quantity.
+    var newQuantity = stock + units;
+
+    // Update the database.
+    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?",
+                     [newQuantity, itemId], (err, results) => {
+
+        if (err) throw err;
+
+        console.log(`Item #${itemId} inventory increased by ${units} to ${newQuantity}.`);
+
+        backToMain();
     });
 }
 

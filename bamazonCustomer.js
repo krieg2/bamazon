@@ -42,7 +42,7 @@ function buyPrompt(){
         name: "itemId",
         message: "Which product ID would you like to buy?",
         validate: function(value) {
-            return isNaN(value) === true ? false : true;
+            return isNaN(value) === true || value < 1 ? false : true;
         }
     },
     {
@@ -50,7 +50,7 @@ function buyPrompt(){
         name: "units",
         message: "How many would you like to buy?",
         validate: function(value) {
-            return isNaN(value) === true ? false : true;
+            return isNaN(value) === true || value < 1 ? false : true;
         }        
     }
 	  ]).then( function(response) {
