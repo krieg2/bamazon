@@ -62,38 +62,38 @@ function buyPrompt(){
             return isNaN(value) === true || value < 1 ? false : true;
         }        
     }
-	  ]).then( function(response) {
+    ]).then( function(response) {
 
         // Check the stock...
         checkInventory(parseInt(response.itemId), parseInt(response.units));
-	  });
+    });
 }
 
 function checkInventory(itemId, units){
 
     // Query the database for stock_quantity of the given itemId.
     connection.query("SELECT stock_quantity, price FROM products WHERE ?",
-    	             {item_id: itemId}, (err, results) => {
+                     {item_id: itemId}, (err, results) => {
 
         if (err) throw err;
 
-      	if(results !== undefined){
+        if(results !== undefined){
 
-      	    let stock = results[0].stock_quantity;
+            let stock = results[0].stock_quantity;
             let price = results[0].price;
 
-    		// Compare existing stock to requested unit amount.
-      		if(stock < units){
+            // Compare existing stock to requested unit amount.
+            if(stock < units){
 
-      			console.log("Insufficient quantity!");
+                console.log("Insufficient quantity!");
 
                 continueShopping();
-      		} else{
+            } else{
 
                 // Update the database and reduce the quantity.
                 reduceQuantity(itemId, stock, units, price);
-      		}
-		  }
+            }
+        }
     });
 }
 

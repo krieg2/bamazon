@@ -30,8 +30,8 @@ function mainMenu(){
     }
     ]).then( function(response) {
 
-    	// These are the main menu choices
-    	// and their corresponsing function calls.
+        // These are the main menu choices
+        // and their corresponsing function calls.
         switch (response.choice) {
           case "View Product Sales by Department":
             viewDeptSales();
@@ -47,42 +47,42 @@ function mainMenu(){
 
 function viewDeptSales(){
 
-	// This query is an OUTER JOIN so that all departments can be viewed
-	// regardless of whether products exist in that department. Default value
-	// for product_sales and total_profit to 0.
-	connection.query(`SELECT d.department_id, d.department_name,
-       				  d.over_head_costs, IFNULL(SUM(p.product_sales), 0) AS product_sales,
+    // This query is an OUTER JOIN so that all departments can be viewed
+    // regardless of whether products exist in that department. Default value
+    // for product_sales and total_profit to 0.
+    connection.query(`SELECT d.department_id, d.department_name,
+                      d.over_head_costs, IFNULL(SUM(p.product_sales), 0) AS product_sales,
                       IFNULL((SUM(p.product_sales) - d.over_head_costs), 0) AS total_profit
                       FROM products p
-					  RIGHT OUTER JOIN departments d ON p.department_name = d.department_name
-				  	  GROUP BY d.department_id`, (err, results) => {
+                      RIGHT OUTER JOIN departments d ON p.department_name = d.department_name
+                      GROUP BY d.department_id`, (err, results) => {
 
         if (err) throw err;
 
         // Create the column headers for the table.
-	    let header = ["department_id", "department_name",
-	    			  "over_head_costs", "product_sales",
-	    			  "total_profit"];
-		let data = [header];
+        let header = ["department_id", "department_name",
+                      "over_head_costs", "product_sales",
+                      "total_profit"];
+        let data = [header];
 
-		// Push each department result into the data array.
-		for(var i=0; i < results.length; i++){
-			data.push([results[i].department_id,
-					   results[i].department_name,
-		               results[i].over_head_costs,
-			           results[i].product_sales,
-			           results[i].total_profit]);
-		}
+        // Push each department result into the data array.
+        for(var i=0; i < results.length; i++){
+            data.push([results[i].department_id,
+                       results[i].department_name,
+                       results[i].over_head_costs,
+                       results[i].product_sales,
+                       results[i].total_profit]);
+        }
 
-		let output = table(data); 
-		console.log(output);
-		backToMain();
+        let output = table(data); 
+        console.log(output);
+        backToMain();
     });
 }
 
 function createDept(){
 
-	// Input a department name and overhead cost amount.
+    // Input a department name and overhead cost amount.
     inquirer.prompt([
     {
         type: "input",
@@ -134,11 +134,11 @@ function backToMain(){
 
         if(response.yesNo){
 
-        	// Display the main menu.
+            // Display the main menu.
             mainMenu();
         } else {
 
-        	// End the connection.
+            // End the connection.
             connection.end();
         }
     });
